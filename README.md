@@ -1,6 +1,6 @@
 # Arnux OS
 
-Arnux is a local-first desktop operating system that runs in the browser and deploys as a static GitHub Pages site. Its current interface combines modern responsive behavior with a Windows 95-inspired visual language.
+Arnux is a local-first desktop operating system that runs in the browser and deploys as a static GitHub Pages site. Its current interface is a modern desktop shell with dark glass surfaces, rounded app windows, subtle depth, responsive layout, and a compact taskbar.
 
 ## Platform features
 
