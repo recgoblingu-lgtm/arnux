@@ -2,6 +2,8 @@
 
 Arnux is a local-first desktop operating system that runs in the browser and deploys as a static GitHub Pages site.
 
+The default visual skin is inspired by Windows 95: teal desktop, gray beveled controls, blue title bars, classic Start-style launcher, and retro window chrome. The underlying apps and local-first APIs remain modern and functional.
+
 ## Platform features
 
 - **IndexedDB filesystem** with automatic migration from the earlier localStorage filesystem
