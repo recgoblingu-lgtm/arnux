@@ -16,6 +16,7 @@ The default visual skin is inspired by Windows 95: teal desktop, gray beveled co
 - **Direct file downloads** from the Files app, plus full filesystem backup export
 - **Terminal tabs** with independent local sessions
 - **Classic apps:** working Minesweeper and ArnuxPaint with PNG export
+- **Media and utility apps:** Image Viewer for uploaded images, Music Player for local MP3s, Mini Game Hub with Snake and Pong, Weather demo, and Clock with analog, digital, and timer modes
 - **Startup MIDI-style music** generated with Web Audio after the user enables it on the boot screen
 - **First-boot setup** for display name and accent color
 
