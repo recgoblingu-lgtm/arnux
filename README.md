@@ -2,6 +2,12 @@
 
 Arnux is a local-first desktop operating system that runs in the browser and deploys as a static GitHub Pages site. Its current interface is a modern desktop shell with dark glass surfaces, rounded app windows, subtle depth, responsive layout, and a compact taskbar.
 
+## Developer Hub
+
+Open **Developer Hub** from the launcher or ArnuxStore to create an app without leaving Arnux. The Hub provides editable fields for app identity, version, icon, color, permissions, HTML, and JavaScript. It can save a local draft, preview the app in a new tab, validate the manifest, download `manifest.js`, `app.js`, and `README.md`, and copy the GitHub URL for the app folder.
+
+GitHub is the only app database and sharing system. Commit the downloaded files to `apps/your-app` in the repository. The GitHub Actions catalog workflow scans `/apps/`, rebuilds `apps/catalog.js`, and ArnuxStore automatically discovers the app.
+
 ## Platform features
 
 - IndexedDB filesystem with localStorage migration
@@ -16,13 +22,14 @@ Arnux is a local-first desktop operating system that runs in the browser and dep
 - Custom desktop icons, wallpaper uploads, themes, accessibility modes, and quota display
 - App permissions, Store install/update/uninstall, developer mode, and SDK manifests with versions, changelogs, and dependencies
 
-## Browser note
+## App database workflow
 
-External pages can be opened in the sandboxed iframe browser when their own security policy permits framing. Sites that send `X-Frame-Options` or restrictive `Content-Security-Policy` headers may refuse to load, which Arnux does not bypass.
-
-## Third-party starter template
-
-Open [`arnux-app-template/starter.js`](arnux-app-template/starter.js) for a ready-to-copy app manifest. It demonstrates `ArnuxSDK.manifest`, local storage, permissions, notifications, placeholders, and a `wire()` interaction hook.
+1. Open Developer Hub.
+2. Edit the app fields and code.
+3. Click **Validate** and **Download app files**.
+4. Create `apps/your-app` on GitHub and upload the three downloaded files.
+5. Open a pull request or merge to `main`.
+6. GitHub Actions validates the app and rebuilds the catalog automatically.
 
 ## Run locally
 
