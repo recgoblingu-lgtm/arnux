@@ -17,6 +17,22 @@ window.ARNYX_APP_CATALOG = [
     "path": "apps/test"
   },
   {
+    "id": "deeznutssimulator",
+    "name": "DeezNutsSimulator",
+    "version": "1.0.0",
+    "icon": "◆",
+    "color": "#5778ff",
+    "description": "test game (NOT OUT YRT)",
+    "permissions": [
+      "storage"
+    ],
+    "dependencies": [],
+    "changelog": [
+      "Initial release"
+    ],
+    "path": "apps/DeezNutsSim"
+  },
+  {
     "id": "hello-arnux",
     "name": "Hello Arnux",
     "version": "1.0.0",
