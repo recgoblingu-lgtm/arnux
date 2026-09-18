@@ -13,7 +13,10 @@ The default visual skin is inspired by Windows 95: teal desktop, gray beveled co
 - **Keyboard shortcuts:** `Ctrl/Cmd + Space` launcher, `Ctrl/Cmd + L` terminal, `Alt + Tab` window switching, `Esc` dismisses overlays
 - **Movable and resizable windows** with minimize, maximize, and close controls
 - **File import/export** through the Files app as an `arnux-files.json` backup
+- **Direct file downloads** from the Files app, plus full filesystem backup export
 - **Terminal tabs** with independent local sessions
+- **Classic apps:** working Minesweeper and ArnuxPaint with PNG export
+- **Startup MIDI-style music** generated with Web Audio after the user enables it on the boot screen
 - **First-boot setup** for display name and accent color
 
 ## Developer SDK
