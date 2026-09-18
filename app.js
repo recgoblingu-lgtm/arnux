@@ -2,70 +2,40 @@ const input = document.querySelector('#commandInput');
 const form = document.querySelector('#commandForm');
 const output = document.querySelector('#output');
 const body = document.querySelector('#terminalBody');
-const history = [];
-let historyIndex = 0;
-let cwd = '~';
-const files = {
-  '~': ['.bash_logout', '.bashrc', '.profile', 'README.md', 'projects', 'welcome.txt'],
-  '~/projects': ['arnux', 'notes.md']
+const history = JSON.parse(localStorage.getItem('arnux-history') || '[]');
+let historyIndex = history.length;
+let cwd = localStorage.getItem('arnux-cwd') || '/home/guest';
+const HOME = '/home/guest';
+const STORAGE_KEY = 'arnux-filesystem-v2';
+const defaultFs = {
+  '/home/guest/.bash_logout': {type:'file', content:''}, '/home/guest/.bashrc': {type:'file', content:'# Arnux shell configuration\n'},
+  '/home/guest/.profile': {type:'file', content:'# Welcome to Arnux\n'}, '/home/guest/README.md': {type:'file', content:'Welcome to Arnux. A Linux terminal for the open web.\n'},
+  '/home/guest/welcome.txt': {type:'file', content:'Type help to explore your new browser shell.\n'}, '/home/guest/projects': {type:'dir'},
+  '/home/guest/projects/arnux': {type:'dir'}, '/home/guest/projects/notes.md': {type:'file', content:'Ideas live here.\n'},
+  '/tmp': {type:'dir'}, '/var': {type:'dir'}, '/etc': {type:'dir'}, '/usr': {type:'dir'}
 };
-const commands = ['help','clear','echo','pwd','ls','cd','cat','whoami','date','neofetch','uname','history','touch','mkdir'];
-
-function print(text, className='') {
-  const line = document.createElement('div');
-  line.className = `output-line ${className}`;
-  line.textContent = text;
-  output.appendChild(line);
-  body.scrollTop = body.scrollHeight;
-}
-function promptPath(){ return cwd === '~' ? '~' : cwd; }
-function commandEcho(command){
-  const line = document.createElement('div'); line.className='output-command';
-  line.innerHTML = `<span class="prompt-user">guest</span><span class="prompt-at">@</span><span class="prompt-host">arnux</span><span class="prompt-colon">:</span><span class="prompt-path">${promptPath()}</span><span class="prompt-symbol">$</span> ${escapeHtml(command)}`;
-  output.appendChild(line);
-}
-function escapeHtml(value){return value.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function resolvePath(path){
-  if(!path || path==='.') return cwd;
-  if(path==='~') return '~';
-  if(path.startsWith('~/')) return path.replace(/\/$/,'');
-  if(path==='..') return cwd === '~' ? '~' : '~';
-  return `${cwd === '~' ? '~' : cwd}/${path}`.replace('//','/');
-}
-function run(raw){
-  const command = raw.trim(); if(!command) return;
-  history.push(command); historyIndex = history.length; commandEcho(command);
-  const [name, ...args] = command.split(/\s+/); const rest = args.join(' ');
-  switch(name){
-    case 'help': print('Available commands:'); print('  help       show this message'); print('  clear      clear the terminal'); print('  echo       print text to the terminal'); print('  pwd        print working directory'); print('  ls         list directory contents'); print('  cd         change directory'); print('  cat        read a file'); print('  neofetch   display system information'); print('  whoami     print current user'); print('  date       print the current date'); print('  uname      print system information'); print('  history    show command history'); print('  touch      create a file'); print('  mkdir      create a directory'); break;
-    case 'clear': output.innerHTML=''; break;
-    case 'echo': print(rest.replace(/^['"]|['"]$/g,'')); break;
-    case 'pwd': print(cwd === '~' ? '/home/guest' : `/home/guest/${cwd.slice(2)}`); break;
-    case 'whoami': print('guest'); break;
-    case 'date': print(new Date().toString()); break;
-    case 'uname': print(args.includes('-a') ? 'Arnux 1.0.0 browser x86_64 GNU/Linux' : 'Arnux'); break;
-    case 'ls': { const target = args.find(a=>!a.startsWith('-')); const path = target ? resolvePath(target) : cwd; if(files[path]) print(files[path].join(args.includes('-l')||args.includes('-la') ? '  ' : '  ')); else print(`ls: cannot access '${target||path}': No such file or directory`,'output-error'); break; }
-    case 'cd': { const target=resolvePath(args[0]||'~'); if(target==='~'||files[target]) cwd=target; else print(`bash: cd: ${args[0]}: No such file or directory`,'output-error'); break; }
-    case 'cat': { const f=args[0]; if(f==='README.md') print('Welcome to Arnux. A Linux terminal for the open web.'); else if(f==='welcome.txt') print('Type help to explore your new browser shell.'); else print(`cat: ${f||''}: No such file or directory`,'output-error'); break; }
-    case 'neofetch': print('      .--.       guest@arnux'); print('     |o_o |      ----------------'); print('     |:_/ |      OS: Arnux Linux (browser)'); print('    //   \\      Host: Web Runtime'); print('   (|     | )    Kernel: JavaScript 22'); print('  /\_   _/\\     Shell: arnux 1.0.0'); print('  \___)=(___/    Uptime: just now','output-title'); break;
-    case 'history': history.forEach((item,i)=>print(` ${String(i+1).padStart(2,' ')}  ${item}`)); break;
-    case 'touch': if(args[0]) files[cwd]?.push(args[0]); else print('touch: missing file operand','output-error'); break;
-    case 'mkdir': if(args[0]) files[resolvePath(args[0])] = []; else print('mkdir: missing operand','output-error'); break;
-    default: print(`${name}: command not found. Type 'help' for available commands.`,'output-error');
-  }
-  input.value=''; input.focus(); updatePrompt();
-}
-function updatePrompt(){document.querySelector('.prompt-path').textContent=promptPath();}
-form.addEventListener('submit', e=>{e.preventDefault();run(input.value)});
-input.addEventListener('keydown', e=>{
-  if(e.key==='ArrowUp'){e.preventDefault(); if(historyIndex>0){historyIndex--;input.value=history[historyIndex]}}
-  if(e.key==='ArrowDown'){e.preventDefault(); if(historyIndex<history.length-1){historyIndex++;input.value=history[historyIndex]}else{historyIndex=history.length;input.value=''}}
-  if(e.key==='Tab'){e.preventDefault(); const match=commands.find(c=>c.startsWith(input.value)); if(match) input.value=match}
-});
-body.addEventListener('click',()=>input.focus());
-document.querySelectorAll('[data-command]').forEach(btn=>btn.addEventListener('click',()=>run(btn.dataset.command)));
-document.querySelector('#clearButton').addEventListener('click',()=>{output.innerHTML='';input.focus()});
-document.querySelector('#runButton').addEventListener('click',()=>run(input.value));
-document.querySelector('#themeButton').addEventListener('click',()=>document.body.classList.toggle('dark-mode'));
-document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();output.innerHTML='';input.focus()}});
-input.focus();
+let fs = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || defaultFs;
+const commands = ['alias','apt','bash','cat','cd','clear','cp','curl','date','df','diff','du','echo','env','exit','find','grep','head','help','history','hostname','kill','less','ln','ls','man','mkdir','more','mv','nano','node','npm','neofetch','ping','printf','ps','pwd','reboot','rm','rmdir','sed','shutdown','sort','tail','tar','touch','top','uname','uptime','whoami','which','xargs','yes'];
+const aliases = {ll:'ls -la', la:'ls -a', cls:'clear'};
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(fs)); localStorage.setItem('arnux-history', JSON.stringify(history.slice(-100))); localStorage.setItem('arnux-cwd', cwd); }
+function print(text='', cls=''){const line=document.createElement('div');line.className=`output-line ${cls}`;line.textContent=text;output.appendChild(line);body.scrollTop=body.scrollHeight;}
+function printLines(text, cls=''){String(text).split('\n').forEach(line=>print(line,cls));}
+function escapeHtml(v){return v.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function commandEcho(command){const line=document.createElement('div');line.className='output-command';line.innerHTML=`<span class="prompt-user">guest</span><span class="prompt-at">@</span><span class="prompt-host">arnux</span><span class="prompt-colon">:</span><span class="prompt-path">${displayPath()}</span><span class="prompt-symbol">$</span> ${escapeHtml(command)}`;output.appendChild(line);}
+function displayPath(){return cwd===HOME?'~':cwd.startsWith(HOME+'/')?'~'+cwd.slice(HOME.length):cwd;}
+function normalize(path){const parts=(path.startsWith('/')?path:`${cwd}/${path}`).split('/');const out=[];for(const p of parts){if(!p||p==='.')continue;if(p==='..')out.pop();else out.push(p)}return '/'+out.join('/')||'/';}
+function resolve(path='~'){return path==='~'||path.startsWith('~/')?normalize(HOME+(path==='~'?'':path.slice(1))):normalize(path);}
+function base(path){return path.split('/').pop()||'/';}
+function exists(path){return Boolean(fs[path]);}
+function isDir(path){return fs[path]?.type==='dir';}
+function children(dir){const prefix=dir==='/'?'/':dir+'/';return Object.keys(fs).filter(p=>p!==dir&&p.startsWith(prefix)&&!p.slice(prefix.length).includes('/')).sort();}
+function parse(raw){const m=raw.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g)||[];return m.map(v=>v.replace(/^['"]|['"]$/g,''));}
+function pathArg(arg){return resolve(arg||'.');}
+function help(){printLines(`Arnux shell — commands available in this browser session\n\nFiles & navigation\n  ls cd pwd tree     list and move around the local filesystem\n  cat less head tail read files; touch mkdir create entries\n  cp mv rm rmdir     copy, move, remove entries\n  find grep diff     search and compare files\n\nSystem & shell\n  clear history help man which env echo printf date whoami hostname\n  ps top df du free uptime uname neofetch ping kill reboot shutdown\n  sort uniq wc sed xargs yes\n\nDeveloper tools\n  node               run JavaScript expressions or a mini REPL\n  npm                local npm-style package commands\n  nano <file>        open the in-browser text editor\n  curl <url>         show a safe request preview\n  apt                package manager simulation\n\nThis is a browser sandbox: changes are saved locally in localStorage. It cannot access your real computer or run arbitrary native Linux binaries.`);}
+function nodeCommand(args){if(!args.length){print('Welcome to Node.js v22.0.0 (Arnux runtime)');print('Type .help for more information.');return}const code=args.join(' ');if(code==='--version'||code==='-v'){print('v22.0.0');return}if(code.includes('process.platform')){print('linux');return}if(code.includes('process.version')){print('v22.0.0');return}if(code.includes('console.log')){const match=code.match(/console\.log\((.*)\)/);print((match?match[1]:'').replace(/^['"]|['"]$/g,''));return}try{const safe=code.replace(/Math\.random\(\)/g,'0.42');const val=Function(`"use strict";return (${safe})`)();print(String(val));}catch{print('undefined','output-error');}}
+function nano(path){const modal=document.querySelector('#nanoModal');const title=document.querySelector('#nanoTitle');const area=document.querySelector('#nanoEditor');title.textContent=`GNU nano — ${path}`;area.value=fs[path]?.content||'';modal.classList.add('open');area.focus();document.querySelector('#nanoSave').onclick=()=>{fs[path]={type:'file',content:area.value};save();closeNano();print(`[ saved ${path} ]`,'output-title');input.focus()};document.querySelector('#nanoCancel').onclick=()=>{closeNano();input.focus()};}
+function closeNano(){document.querySelector('#nanoModal').classList.remove('open');}
+function run(raw){let command=raw.trim();if(!command)return;if(aliases[command])command=aliases[command];history.push(command);historyIndex=history.length;save();commandEcho(command);const parts=parse(command),name=parts.shift(),args=parts;const rest=args.join(' ');switch(name){
+case'help':help();break;case'clear':output.innerHTML='';break;case'echo':print(rest);break;case'printf':print(rest.replace(/%s/g,'').replace(/\\n/g,'\n'));break;case'pwd':print(cwd);break;case'whoami':print('guest');break;case'hostname':print('arnux');break;case'date':print(new Date().toString());break;case'uname':print(args.includes('-a')?'Linux arnux 6.8.0-browser #1 SMP x86_64 GNU/Linux':'Linux');break;case'uptime':print('up 0 days, 0:00, 1 user, load average: 0.00, 0.00, 0.00');break;case'env':print('USER=guest\nHOME=/home/guest\nSHELL=/bin/arnux\nTERM=xterm-256color\nPATH=/usr/local/bin:/usr/bin:/bin');break;case'ls':{const target=args.find(a=>!a.startsWith('-'));const p=pathArg(target);if(!isDir(p)){print(`ls: cannot access '${target||p}': No such file or directory`,'output-error');break}const long=args.some(a=>a.includes('l'));print(children(p).map(x=>long?`${fs[x].type==='dir'?'drwxr-xr-x':'-rw-r--r--'}  guest guest  ${fs[x].type==='dir'?4096:fs[x].content.length}  ${base(x)}`:base(x)).join(long?'\n':'  '));break}case'cd':{const p=pathArg(args[0]||'~');if(isDir(p)){cwd=p;save();updatePrompt()}else print(`bash: cd: ${args[0]||'~'}: No such file or directory`,'output-error');break}case'cat':case'less':case'more':case'head':case'tail':{const p=pathArg(args[0]);if(!fs[p]||isDir(p)){print(`${name}: ${args[0]||''}: No such file or directory`,'output-error');break}let content=fs[p].content||'';if(name==='head')content=content.split('\n').slice(0,10).join('\n');if(name==='tail')content=content.split('\n').slice(-10).join('\n');printLines(content);break}case'touch':args.forEach(a=>{const p=pathArg(a);if(!exists(p))fs[p]={type:'file',content:''}});save();break;case'mkdir':args.filter(a=>!a.startsWith('-')).forEach(a=>{const p=pathArg(a);if(!exists(p))fs[p]={type:'dir'}});save();break;case'rmdir':args.forEach(a=>{const p=pathArg(a);if(isDir(p)&&!children(p).length)delete fs[p];else print(`rmdir: failed to remove '${a}': Directory not empty`,'output-error')});save();break;case'rm':args.filter(a=>!a.startsWith('-')).forEach(a=>{const p=pathArg(a);if(exists(p))delete fs[p];else print(`rm: cannot remove '${a}': No such file or directory`,'output-error')});save();break;case'cp':case'mv':{const src=pathArg(args[0]),dst=pathArg(args[1]);if(!fs[src]){print(`${name}: cannot stat '${args[0]}': No such file or directory`,'output-error');break}fs[dst]={...fs[src]};if(name==='mv')delete fs[src];save();break}case'tree':{const walk=(p,prefix='')=>{children(p).forEach((x,i)=>{print(prefix+(i===children(p).length-1?'└── ':'├── ')+base(x));if(isDir(x))walk(x,prefix+(i===children(p).length-1?'    ':'│   '))})};print('.');walk(cwd);break}case'nano':{const p=pathArg(args[0]||'untitled.txt');if(isDir(p)){print(`nano: ${args[0]}: Is a directory`,'output-error');break}nano(p);break}case'node':nodeCommand(args);break;case'npm':{if(args[0]==='--version'||args[0]==='-v')print('10.8.2');else if(args[0]==='init')print('This utility will walk you through creating a package.json.\npackage name: (arnux-project) arnux-project\nversion: (1.0.0) 1.0.0\n\nSaved package.json');else if(args[0]==='install'||args[0]==='i')print('npm install: package simulation complete (no network packages installed).');else if(args[0]==='run')print(`> arnux@1.0.0 ${args[1]||'start'}\n> echo "script executed in browser"\nscript executed in browser`);else print('Usage: npm [install|init|run|--version]');break}case'neofetch':printLines('      .--.       guest@arnux\n     |o_o |      ----------------\n     |:_/ |      OS: Arnux Linux (browser)\n    //   \\\\      Host: Web Runtime\n   (|     | )    Kernel: JavaScript 22\n  /\\_   _/\\     Shell: arnux 1.0.0\n  \\___)=(___/    Storage: localStorage');break;case'which':print(commands.includes(args[0])?`/usr/bin/${args[0]}`:`${args[0]}: no arnux entry`);break;case'history':history.forEach((x,i)=>print(`${String(i+1).padStart(4,' ')}  ${x}`));break;case'find':{const needle=args.find(x=>x&&!x.startsWith('-'))||'.';print(Object.keys(fs).filter(p=>p.startsWith(pathArg(needle))).join('\n'));break}case'grep':{const term=args[0],p=pathArg(args[1]);if(fs[p]?.content)printLines(fs[p].content.split('\n').filter(l=>l.includes(term)).join('\n'));else print(`grep: ${args[1]||''}: No such file or directory`,'output-error');break}case'wc':{const p=pathArg(args[0]);if(fs[p]?.content){const lines=fs[p].content.split('\n').length,words=fs[p].content.trim().split(/\s+/).filter(Boolean).length,chars=fs[p].content.length;print(`${lines} ${words} ${chars} ${args[0]}`)}break}case'df':print('Filesystem     1K-blocks  Used Available Use% Mounted on\narnux-local    1048576   128   1048448   1% /');break;case'du':print('4\t.\n4\t./projects\n8\t.');break;case'ps':case'top':print('PID  TTY      TIME     CMD\n1    pts/0    00:00:00 arnux-shell\n42   pts/0    00:00:00 browser-runtime');break;case'free':print('              total        used        free\nMem:        1048576      12800     1035776');break;case'ping':print(`PING ${args[0]||'localhost'}: browser sandbox does not send network packets.`);break;case'curl':print(`curl: request preview only — network access is disabled in Arnux local mode\nURL: ${args[0]||'(missing)'}`,'pending');break;case'apt':case'apt-get':print('Arnux package manager: native Linux packages are unavailable in the browser.');break;case'man':print(`No manual entry for ${args[0]||''}. Try help.`);break;case'yes':for(let i=0;i<5;i++)print(args.join(' ')||'y');break;case'exit':print('logout (the browser session remains open)');break;case'reboot':case'shutdown':print('Operation not permitted in browser sandbox.');break;default:print(`${name}: command not found. Type 'help' for available commands.`,'output-error')};input.value='';input.focus();updatePrompt();}
+function updatePrompt(){document.querySelector('.prompt-path').textContent=displayPath();document.querySelector('.terminal-title').textContent=`guest@arnux: ${displayPath()}`;}
+form.addEventListener('submit',e=>{e.preventDefault();run(input.value)});input.addEventListener('keydown',e=>{if(e.key==='ArrowUp'){e.preventDefault();if(historyIndex>0){historyIndex--;input.value=history[historyIndex]}}if(e.key==='ArrowDown'){e.preventDefault();if(historyIndex<history.length-1){historyIndex++;input.value=history[historyIndex]}else{historyIndex=history.length;input.value=''}}if(e.key==='Tab'){e.preventDefault();const match=commands.find(c=>c.startsWith(input.value));if(match)input.value=match}});body.addEventListener('click',()=>input.focus());document.querySelectorAll('[data-command]').forEach(btn=>btn.addEventListener('click',()=>run(btn.dataset.command)));document.querySelector('#clearButton').addEventListener('click',()=>{output.innerHTML='';input.focus()});document.querySelector('#runButton').addEventListener('click',()=>run(input.value));document.querySelector('#themeButton').addEventListener('click',()=>document.body.classList.toggle('dark-mode'));document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();output.innerHTML='';input.focus()}if(e.key==='Escape')closeNano()});updatePrompt();input.focus();
