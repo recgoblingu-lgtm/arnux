@@ -1,80 +1,13 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Arnux — a Linux-inspired terminal that runs in your browser." />
-  <title>Arnux — Browser Terminal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Arnux — a full browser operating system."><title>Arnux OS</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"></head>
 <body>
-  <main class="app-shell">
-    <header class="topbar">
-      <div class="brand"><span class="brand-mark">A</span><span>arnux</span><span class="version">v1.0.0</span></div>
-      <div class="top-actions">
-        <button class="icon-button" id="clearButton" title="Clear terminal">⌫</button>
-        <button class="icon-button" id="themeButton" title="Toggle theme">◐</button>
-        <button class="run-button" id="runButton"><span class="play">▶</span> Run</button>
-      </div>
-    </header>
-
-    <section class="hero">
-      <div>
-        <p class="eyebrow">BROWSER-BASED LINUX ENVIRONMENT</p>
-        <h1>Your terminal.<br><em>Everywhere.</em></h1>
-        <p class="hero-copy">A fast, friendly Linux-inspired shell that runs entirely in your browser. No setup. No servers. Just type.</p>
-      </div>
-      <div class="hero-cue"><span class="pulse-dot"></span><span>LOCAL SESSION</span></div>
-    </section>
-
-    <section class="terminal-card" aria-label="Arnux terminal">
-      <div class="terminal-head">
-        <div class="window-dots"><i></i><i></i><i></i></div>
-        <div class="terminal-title">guest@arnux: ~</div>
-        <div class="terminal-status"><span class="status-dot"></span>ready</div>
-      </div>
-      <div class="terminal-body" id="terminalBody" tabindex="0">
-        <div class="welcome">
-          <div class="ascii">    _    ____  _   _  _  __
-   / \  |  _ \| \ | || |/ /
-  / _ \ | |_) |  \| || ' / 
- / ___ \|  _ &lt;| |\  || . \ 
-/_/   \_\_| \_\|_| \_||_|\_\</div>
-          <p class="welcome-line">Welcome to <strong>Arnux</strong>, a Linux terminal for the web.</p>
-          <p class="muted">Type <span class="command-hint">help</span> to see what you can do.</p>
-        </div>
-        <div id="output" aria-live="polite"></div>
-        <form id="commandForm" class="command-line" autocomplete="off">
-          <span class="prompt"><span class="prompt-user">guest</span><span class="prompt-at">@</span><span class="prompt-host">arnux</span><span class="prompt-colon">:</span><span class="prompt-path">~</span><span class="prompt-symbol">$</span></span>
-          <input id="commandInput" spellcheck="false" aria-label="Terminal command" autofocus />
-        </form>
-      </div>
-      <div class="terminal-foot"><span>⌘ + K to clear</span><span>↑ ↓ for history</span><span>Tab to autocomplete</span></div>
-    </section>
-
-    <section class="nano-modal" id="nanoModal" aria-label="Nano editor">
-      <div class="nano-window">
-        <div class="nano-header"><span id="nanoTitle">GNU nano</span><span>local file editor</span></div>
-        <textarea id="nanoEditor" spellcheck="false" aria-label="Nano text editor"></textarea>
-        <div class="nano-footer"><span>^O Write Out</span><span>^X Exit</span><div><button id="nanoCancel">Cancel</button><button id="nanoSave">Save file</button></div></div>
-      </div>
-    </section>
-
-    <section class="quick-start">
-      <div class="section-label">QUICK START</div>
-      <div class="chips">
-        <button class="chip" data-command="help"><span>?</span> help</button>
-        <button class="chip" data-command="neofetch"><span>◇</span> neofetch</button>
-        <button class="chip" data-command="ls -la"><span>▤</span> ls -la</button>
-        <button class="chip" data-command="echo 'Hello, Arnux!'"><span>›_</span> echo</button>
-      </div>
-    </section>
-
-    <footer><span>ARNVX SYSTEMS</span><span>Built for the open web</span><a href="https://github.com" target="_blank" rel="noreferrer">View on GitHub ↗</a></footer>
-  </main>
-  <script src="app.js"></script>
-</body>
-</html>
+<div id="os" class="os-shell">
+  <header class="topbar"><div class="os-logo"><span>A</span> arnux <small>OS 1.0</small></div><div class="top-center" id="topTime"></div><div class="top-right"><span class="wifi">◉</span><span id="battery">100%</span><button id="powerButton" title="Power menu">⏻</button></div></header>
+  <main class="workspace" id="workspace"><div class="desktop-welcome"><div class="welcome-badge">ARN</div><h1>Welcome to Arnux</h1><p>A friendly operating system for the open web.</p><div class="desktop-shortcuts"><button data-open="browser"><b>◎</b><span>Browser</span></button><button data-open="files"><b>▧</b><span>Files</span></button><button data-open="terminal"><b>›_</b><span>Terminal</span></button><button data-open="store"><b>▦</b><span>ArnuxStore</span></button></div></div></main>
+  <footer class="dock"><button class="launcher" id="launcherButton">A</button><div class="dock-apps"><button data-open="browser" title="Browser">◎</button><button data-open="files" title="Files">▧</button><button data-open="terminal" title="Terminal">›_</button><button data-open="notes" title="Notes">✎</button><button data-open="store" title="ArnuxStore">▦</button></div><div class="dock-date" id="dockDate"></div></footer>
+</div>
+<div id="launcherMenu" class="launcher-menu"><div class="launcher-title">Arnux applications</div><div id="launcherApps" class="launcher-grid"></div></div>
+<div id="nanoModal" class="nano-modal"><div class="nano-window"><div class="nano-header"><span id="nanoTitle">GNU nano</span><span>local file editor</span></div><textarea id="nanoEditor" spellcheck="false"></textarea><div class="nano-footer"><span>^O Write Out</span><span>^X Exit</span><div><button id="nanoCancel">Cancel</button><button id="nanoSave">Save file</button></div></div></div></div>
+<script src="app.js"></script>
+</body></html>

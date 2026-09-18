@@ -1,24 +1,39 @@
-# Arnux
+# Arnux OS
 
-Arnux is a Linux-inspired terminal that runs entirely in the browser. It is a static, dependency-free project designed for GitHub Pages or any static web host.
+Arnux is a full desktop-style operating system that runs entirely in the browser. It is local-first, dependency-free, and designed for GitHub Pages or any static web host.
 
-## Features
+## Built-in apps
 
-- Interactive shell with `help`, `ls`, `cd`, `cat`, `echo`, `neofetch`, `history`, `touch`, and `mkdir`
-- Virtual filesystem that persists during the current browser session
-- Command history with arrow keys and Tab autocomplete
-- Dark mode, quick-start commands, and responsive layout
-- No backend, build step, or account required
+- **Browser** — internal `arnux://` pages for Home, Files, ArnuxStore, and About. It deliberately does not contact external websites.
+- **Files** — persistent browser filesystem with folders, file creation, and an in-browser editor.
+- **Terminal** — Linux-inspired local shell with file commands, Node/npm-style simulations, and persistent storage.
+- **Notes** — autosaving local notes app.
+- **ArnuxStore** — local app directory with install/open flows.
+
+All user data is stored in browser `localStorage`. Arnux cannot access the host computer's files or execute native Linux programs.
+
+## Add an app
+
+Apps are intentionally easy to add. In `app.js`, add an entry to the `APPS` registry:
+
+```js
+weather: {
+  name: 'Weather',
+  icon: '☼',
+  color: '#36a6c8',
+  render: () => '<div class="my-app">Hello from Weather</div>'
+}
+```
+
+Then add any app-specific behavior in `wireWindow(win, id)`. The desktop launcher, dock, and ArnuxStore use the registry automatically.
 
 ## Run locally
-
-Open `index.html` in a browser, or serve the folder with any static server:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Then visit `http://localhost:8080`.
+Open `http://localhost:8080`.
 
 ## License
 
