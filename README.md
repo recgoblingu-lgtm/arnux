@@ -1,21 +1,24 @@
 # Arnux OS
 
-Arnux is a local-first desktop operating system that runs in the browser and deploys as a static GitHub Pages site.
-
-The default visual skin is inspired by Windows 95: teal desktop, gray beveled controls, blue title bars, classic Start-style launcher, and retro window chrome.
+Arnux is a local-first desktop operating system that runs in the browser and deploys as a static GitHub Pages site. Its current interface combines modern responsive behavior with a Windows 95-inspired visual language.
 
 ## Platform features
 
-- IndexedDB filesystem with migration from localStorage
+- IndexedDB filesystem with localStorage migration
 - Image thumbnails, drag-and-drop import, cut/copy/paste, and device downloads in Files
-- Local MP3 playlists and audio queue
+- Music playlists and audio queue
 - Minesweeper save/resume
-- Mini Game Hub with Snake, Pong, Tetris, Solitaire, and Breakout modes
+- Mini Game Hub modes: Snake, Pong, Tetris, Solitaire, and Breakout
 - Image Viewer, Music Player, Weather, Clock, ArnuxPaint, and classic apps
-- Desktop widgets, notification center, virtual desktops, and system sounds
+- Desktop widgets, notification center, taskbar, virtual desktops, and system sounds
+- Browser tabs, history, bookmarks, download panel, and fullscreen iframe browsing
 - Local accounts/profile switching, snapshots, and restore points
-- Custom desktop logo, themes, wallpapers, and app icons
-- App permissions, Store install/update/uninstall, and the Arnux SDK
+- Custom desktop icons, wallpaper uploads, themes, accessibility modes, and quota display
+- App permissions, Store install/update/uninstall, developer mode, and SDK manifests with versions, changelogs, and dependencies
+
+## Browser note
+
+External pages can be opened in the sandboxed iframe browser when their own security policy permits framing. Sites that send `X-Frame-Options` or restrictive `Content-Security-Policy` headers may refuse to load, which Arnux does not bypass.
 
 ## Third-party starter template
 
