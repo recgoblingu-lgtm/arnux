@@ -1,41 +1,36 @@
 # Arnux OS
 
-Arnux is a full desktop-style operating system that runs entirely in the browser. It is local-first, dependency-free, and designed for GitHub Pages or any static web host.
+Arnux is a local-first desktop operating system that runs in the browser and deploys as a static GitHub Pages site.
 
-## First boot and personalization
+## Platform features
 
-The animated boot screen initializes the local filesystem and app registry. On first launch, the setup page lets the user choose a display name and accent color. The Settings app can later change the display name, desktop logo, accent color, or reset local data.
+- **IndexedDB filesystem** with automatic migration from the earlier localStorage filesystem
+- **App permissions** declared in each app manifest (`files`, `storage`, or `settings`)
+- **ArnuxStore lifecycle** with Get, Open, Update, and Uninstall controls
+- **Themes and wallpapers** in Settings
+- **Keyboard shortcuts:** `Ctrl/Cmd + Space` launcher, `Ctrl/Cmd + L` terminal, `Alt + Tab` window switching, `Esc` dismisses overlays
+- **Movable and resizable windows** with minimize, maximize, and close controls
+- **File import/export** through the Files app as an `arnux-files.json` backup
+- **Terminal tabs** with independent local sessions
+- **First-boot setup** for display name and accent color
 
-## Built-in apps
+## Developer SDK
 
-- **Browser** — internal `arnux://` pages for Home, Files, ArnuxStore, and About. It deliberately does not contact external websites.
-- **Files** — persistent browser filesystem with folders, file creation, and an in-browser editor.
-- **Terminal** — Linux-inspired local shell with file commands and persistent storage.
-- **Notes** — autosaving local notes app.
-- **Settings** — profile, logo, accent, and local-storage controls.
-- **ArnuxStore** — local app directory with install/open flows.
-
-All user data is stored in browser `localStorage`. Arnux cannot access the host computer's files or execute native Linux programs.
-
-## Add advanced apps
-
-Apps are defined in the `APPS` manifest at the top of `app.js`:
+` sdk.js ` exposes a small API for advanced apps:
 
 ```js
-weather: {
-  name: 'Weather',
-  icon: '☼',
-  color: '#36a6c8',
-  placeholder: 'Search a city',
-  render: weatherApp
-}
+ArnuxSDK.manifest({
+  id: 'weather', name: 'Weather', icon: '☼', color: '#36a6c8',
+  permissions: ['storage'], render: weatherApp
+});
 
-function weatherApp() {
-  return `<div class="my-app"><input placeholder="Search a city"><button>Forecast</button></div>`;
-}
+await ArnuxSDK.permissions.request('weather', ['storage']);
+ArnuxSDK.storage.set('weather-settings', { city: 'Tokyo' });
+ArnuxSDK.notify('Forecast refreshed');
+ArnuxSDK.openApp('notes');
 ```
 
-The desktop launcher, dock, ArnuxStore, window chrome, logos, and placeholder replacement use the manifest automatically. Add app-specific behavior in `wireWindow(win, id)` using a `wireWeather(win)` function for richer interactions and local persistence.
+Add the app to the `APPS` registry in `app.js`. Provide `render()` for markup and a `wireWindow(win, id)` branch for interactive behavior. Manifest `placeholder` text is automatically applied to app inputs.
 
 ## Run locally
 
