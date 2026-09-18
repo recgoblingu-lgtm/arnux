@@ -1,0 +1,24 @@
+name: Validate Arnux Apps
+
+on:
+  pull_request:
+    paths:
+      - 'apps/**'
+      - 'scripts/validate-apps.js'
+      - 'package.json'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'scripts/validate-apps.js'
+      - 'package.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run validate-apps

@@ -1,0 +1,9 @@
+{
+  "name": "arnux-os",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Arnux browser operating system",
+  "scripts": {
+    "validate-apps": "node scripts/validate-apps.js"
+  }
+}
